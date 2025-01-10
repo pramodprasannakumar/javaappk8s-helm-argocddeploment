@@ -31,6 +31,14 @@ data:
   .dockerconfigjson: eyJhdXRocyI6eyIxMy4yMzIuNjYuNzM6NTAwMCI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImF1dGgiOiJZV1J0YVc0NllXUnRhVzQ9In19fQo=
 
 
+
+#do apply this secret speratly
+
+kubectl apply -f nexus-secret.yaml -m argocd
+
+#check if its deployed
+
+kubectl get secret -n argocd
   
 
 
