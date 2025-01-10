@@ -10,4 +10,33 @@ helm create benzcarsite
 #add nexus-secret.yaml inside the benzcarsite 
 
 
+#this below command will give u base64 nexus username and passwrd authentication token add that token in nexus-secret.yaml file 
+
+ token    "eyJhdXRocyI6eyIxMy4yMzIuNjYuNzM6NTAwMCI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImF1dGgiOiJZV1J0YVc0NllXUnRhVzQ9In19fQo="
+
+   
+#echo '{"auths":{"13.232.66.73:5000":{"username":"admin","password":"admin","auth":"'"$(echo -n 'admin:admin' | base64 -w 0)"'"}}}' > config.json
+#cat config.json
+
+
+#like this 
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nexus-secret
+  namespace: argocd
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyIxMy4yMzIuNjYuNzM6NTAwMCI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImF1dGgiOiJZV1J0YVc0NllXUnRhVzQ9In19fQo=
+
+
+  
+
+
 #if argocd installed then this github path we need to add in argocd website /create a application in argocd url / then this will pick auto to deploy into k8s environment.
+
+
+
+
+
