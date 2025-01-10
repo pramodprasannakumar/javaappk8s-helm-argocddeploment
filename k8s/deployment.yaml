@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mercedez-deployment
+  labels:
+    app: mercedez
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mercedez
+  template:
+    metadata:
+      labels:
+        app: mercedez
+    spec:
+      containers:
+        - name: mercedez
+          image: 13.232.66.73:5000/mercedezcar/mercedez:1.1
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: nexus-secret
