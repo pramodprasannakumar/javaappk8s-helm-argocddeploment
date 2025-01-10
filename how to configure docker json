@@ -1,0 +1,94 @@
+The error indicates that the `.dockerconfigjson` value in your `nexus-secret.yml` file is not formatted correctly. Specifically, the encoded `.dockerconfigjson` is invalid. This typically happens when the Base64 encoding step is not done correctly or the input file (`config.json`) is not structured properly.
+
+Let’s fix this step by step:
+
+---
+
+### 1. **Ensure `config.json` is Properly Structured**
+Run this command to generate the correct `config.json` file:
+
+```bash
+echo '{"auths":{"13.232.66.73:5000":{"username":"admin","password":"admin","auth":"'"$(echo -n 'admin:admin' | base64 -w 0)"'"}}}' > config.json
+```
+
+Verify the contents of the `config.json` file:
+
+```bash
+cat config.json
+```
+
+It should look like this:
+
+```json
+{
+  "auths": {
+    "13.232.66.73:5000": {
+      "username": "admin",
+      "password": "admin",
+      "auth": "YWRtaW46YWRtaW4="
+    }
+  }
+}
+```
+
+---
+
+### 2. **Base64 Encode `config.json`**
+Now, Base64 encode the `config.json` file:
+
+```bash
+base64 config.json -w 0
+```
+
+Copy the output (a long string of characters). This will be your `.dockerconfigjson` value.
+
+---
+
+### 3. **Update the YAML File**
+Replace `<BASE64_ENCODED_JSON>` in your `nexus-secret.yml` file with the Base64-encoded string:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nexus-secret
+  namespace: argocd
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: <BASE64_ENCODED_JSON>
+```
+
+For example:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nexus-secret
+  namespace: argocd
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyIxMy4yMzIuNjYuNzM6NTAwMCI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImF1dGgiOiJZV0RsSVY1eVpHRnpZWE4wIn19fQ==
+```
+
+---
+
+### 4. **Apply the YAML File**
+Apply the updated secret:
+
+```bash
+kubectl apply -f nexus-secret.yml -n argocd
+```
+
+---
+
+### Debugging Tip:
+If you encounter further issues:
+- Verify the Base64 encoding by decoding it back to plain text:
+  ```bash
+  echo "<BASE64_ENCODED_JSON>" | base64 -d
+  ```
+  Replace `<BASE64_ENCODED_JSON>` with the actual encoded string.
+- Ensure there are no formatting errors in your YAML file. Use a YAML validator if needed.
+
+Let me know if it works!
