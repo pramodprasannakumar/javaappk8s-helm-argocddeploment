@@ -1,0 +1,247 @@
+#note:-  IP address is nexus publicIP,
+ and the port number 5000 is nexus repo inside http port // not default nexus application port(8081)
+
+
+
+#in slave also change
+
+vi /etc/containerd/config.toml
+ 
+
+[plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = ""
+
+      [plugins."io.containerd.grpc.v1.cri".registry.auths]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".tls]
+        insecure_skip_verify = true
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".http]
+        tls = false
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".auth]
+        auth = "YWRtaW46YWRtaW4="
+
+      [plugins."io.containerd.grpc.v1.cri".registry.headers]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."13.232.66.73:5000"]
+        endpoint = ["http://13.232.66.73:5000"]
+
+
+vi /etc/containerd/config.toml
+     systemctl restart containerd
+   sudo systemctl restart containerd
+     sudo systemctl daemon-reload
+  sudo systemctl restart containerd
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#in master k8s
+
+vi /etc/containerd/config.toml
+ 
+
+[plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = ""
+
+      [plugins."io.containerd.grpc.v1.cri".registry.auths]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".tls]
+        insecure_skip_verify = true
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".http]
+        tls = false
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".auth]
+        auth = "YWRtaW46YWRtaW4="
+
+      [plugins."io.containerd.grpc.v1.cri".registry.headers]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."13.232.66.73:5000"]
+        endpoint = ["http://13.232.66.73:5000"]
+
+
+vi /etc/containerd/config.toml
+     systemctl restart containerd
+   sudo systemctl restart containerd
+     sudo systemctl daemon-reload
+  sudo systemctl restart containerd
+
+
+
+
+
+
+
+command to pull the docker image from nexus-
+
+// for using user and passwrd pull
+
+sudo ctr images pull --plain-http --user admin:admin 13.234.213.234:5000/mercedezcar/mercedez:1.1
+
+
+
+
+
+list images-
+
+sudo ctr images list
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+in  docker configure this for authentication authentication:-
+
+vi daemon.json
+
+
+{
+  "insecure-registries": ["13.234.213.234:5000"]
+}
+
+
+
+systemctl restart docker
+
+
+//crete authentication of base64 for nexus url username and password:-
+
+echo -n "admin:admin" | base64
+
+
+vi /etc/containerd/config.toml
+
+
+
+[plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = ""
+
+      [plugins."io.containerd.grpc.v1.cri".registry.auths]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".tls]
+        insecure_skip_verify = true
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".http]
+        tls = false
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."13.232.66.73:5000".auth]
+        auth = "YWRtaW46YWRtaW4="
+
+      [plugins."io.containerd.grpc.v1.cri".registry.headers]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."13.232.66.73:5000"]
+        endpoint = ["http://13.232.66.73:5000"]
+
+
+
+     systemctl restart containerd
+     sudo systemctl restart containerd
+    sudo systemctl daemon-reload
+  sudo systemctl restart containerd
+
+
+
+
+
+#in docker need to change
+
+echo '{"auths":{"13.232.66.73:5000":{"username":"admin","password":"admin","auth":"'"$(echo -n 'admin:admin' | base64 -w 0)"'"}}}' > config.json
+
+  cat config.json
+
+# cat /root/.docker/config.json
+
+{
+        "auths": {
+                "13.201.12.45:5000": {
+                        "auth": "YWRtaW46YWRtaW4="
+                },
+                "13.234.213.234:5000": {
+                        "auth": "YWRtaW46YWRtaW4="
+                },
+                "43.205.119.33:5000": {
+                        "auth": "YWRtaW46YWRtaW4="
+                },
+                "52.66.211.123:5000": {
+                        "auth": "YWRtaW46YWRtaW4="
+                },
+                "https://index.docker.io/v1/": {
+                        "auth": "cHJhbW9kcHJhc2FubmE6cHJhbW9kZG9jMTI="
+                }
+        }
+}
+
+
+
+
+
+
+image pull from nexus:-
+
+
+crictl -r /run/containerd/containerd.sock pull 13.234.213.234:5000/mercedezcar/mercedez:1.1
+
+crictl -r /run/containerd/containerd.sock pull 13.234.213.234:5000/mercedezcar/mercedez:1.1
+
+
+view images:-
+
+crictl images
+
+
+
+
+
+
+
+
+
+
+
+#docker need to change 
+#push image from docker to nexus repo 
+
+sudo vim /etc/docker/daemon.json
+
+{
+  "insecure-registries": ["43.205.119.33:5000"]
+}
+
+
+
+   systemctl restart docker 
+
+    docker login 43.205.119.33:5000
+
+  docker tag mercedez:1.1 43.205.119.33:5000/repository/mercedezcar/mercedez:1.1
+
+   docker login 43.205.119.33:5000
+
+   docker push 43.205.119.33:5000/repository/docker-hosted/mercedezcar:1.1
+
+   docker images
+
