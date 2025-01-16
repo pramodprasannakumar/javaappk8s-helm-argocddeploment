@@ -46,5 +46,10 @@ kubectl get secret -n argocd
 
 
 
+ kubectl exec -it germancar-benzcarsite-6b8c744f86-6qd2j /bin/bash -n argocd
+
+
+
+
 
 
